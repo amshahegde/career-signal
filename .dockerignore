@@ -1,0 +1,6 @@
+**/__pycache__
+**/*.pyc
+.git
+.gitignore
+backend/test_resume.pdf
+data/gsearch_jobs_*.csv

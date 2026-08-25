@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Signal — Read the market on your resume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0C1116;
+    --panel: #141B23;
+    --panel-raised: #1A222C;
+    --hairline: #2A333D;
+    --amber: #D9A441;
+    --teal: #4FB6A6;
+    --rust: #C1553B;
+    --text: #E8E3D9;
+    --text-muted: #8B94A0;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  ::selection { background: var(--amber); color: var(--ink); }
+
+  a { color: inherit; }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---- Header / ticker bar ---- */
+  header {
+    border-bottom: 1px solid var(--hairline);
+    padding: 18px 0;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-size: 14px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal);
+  }
+  .ticker-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- Hero ---- */
+  .hero {
+    padding: 88px 0 72px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 52px;
+    line-height: 1.08;
+    margin: 0 0 20px;
+    letter-spacing: -0.01em;
+    max-width: 620px;
+  }
+  h1 em { font-style: italic; color: var(--amber); }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 0 40px;
+  }
+
+  .upload-zone {
+    border: 1px dashed var(--hairline);
+    border-radius: var(--radius);
+    padding: 36px;
+    text-align: center;
+    background: var(--panel);
+    transition: border-color 0.15s ease, background 0.15s ease;
+    cursor: pointer;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--amber);
+    background: var(--panel-raised);
+  }
+  .upload-zone input { display: none; }
+  .upload-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .upload-label strong { color: var(--amber); font-weight: 500; }
+  .upload-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  .status-line {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--amber);
+    margin-top: 16px;
+    min-height: 18px;
+  }
+
+  /* ---- Results ---- */
+  #results { display: none; padding: 56px 0 100px; }
+
+  .section-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 32px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    overflow: hidden;
+    width: fit-content;
+  }
+  .tab {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    background: var(--panel);
+    color: var(--text-muted);
+    cursor: pointer;
+    border: none;
+    border-right: 1px solid var(--hairline);
+  }
+  .tab:last-child { border-right: none; }
+  .tab.active { background: var(--amber); color: var(--ink); font-weight: 600; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 500;
+    margin: 0 0 6px;
+  }
+  .panel-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0 0 28px;
+  }
+
+  .overall-score {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    margin-bottom: 28px;
+  }
+  .overall-score .num { font-size: 28px; font-weight: 600; color: var(--amber); }
+  .overall-score .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Bullet cards */
+  .bullet-card {
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+  .bullet-card.perfect { border-color: rgba(79,182,166,0.3); }
+  .bullet-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .bullet-text { font-size: 14.5px; flex: 1; }
+  .bullet-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: var(--radius);
+    white-space: nowrap;
+  }
+  .score-high { color: var(--teal); border: 1px solid rgba(79,182,166,0.4); }
+  .score-mid { color: var(--amber); border: 1px solid rgba(217,164,65,0.4); }
+  .score-low { color: var(--rust); border: 1px solid rgba(193,85,59,0.4); }
+  .bullet-suggestions {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hairline);
+  }
+  .bullet-suggestions div {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    padding: 3px 0;
+  }
+  .bullet-suggestions div::before {
+    content: "→ ";
+    color: var(--amber);
+  }
+
+  /* Skill rows */
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .skill-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    width: 140px;
+    flex-shrink: 0;
+  }
+  .skill-spark { flex-shrink: 0; }
+  .skill-status {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+  .status-RISING { color: var(--teal); border: 1px solid rgba(79,182,166,0.4); }
+  .status-DECLINING { color: var(--rust); border: 1px solid rgba(193,85,59,0.4); }
+  .status-STABLE { color: var(--text-muted); border: 1px solid var(--hairline); }
+  .status-INSUFFICIENT_DATA { color: var(--text-muted); border: 1px solid var(--hairline); opacity: 0.6; }
+
+  /* Pivot cards */
+  .pivot-card {
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+  .pivot-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .pivot-title {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    text-transform: capitalize;
+  }
+  .pivot-sim {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+  }
+  .sim-bar {
+    height: 4px;
+    background: var(--hairline);
+    border-radius: 2px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .sim-bar-fill { height: 100%; background: var(--amber); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    background: var(--panel-raised);
+    border: 1px solid var(--hairline);
+    padding: 3px 9px;
+    border-radius: 12px;
+    color: var(--text-muted);
+  }
+
+  .note {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--hairline);
+    line-height: 1.6;
+  }
+
+  footer {
+    border-top: 1px solid var(--hairline);
+    padding: 24px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+  }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 36px; }
+    .skill-name { width: 100px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-row">
+    <div class="logo"><span class="dot"></span> Career Signal</div>
+    <div class="ticker-note" id="vocab-note">loading vocabulary…</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Resume market intelligence</div>
+    <h1>Read the market <em>on your resume.</em></h1>
+    <p class="hero-sub">Upload your resume. Get three real analyses: phrasing that undersells you, which of your skills are gaining or losing ground, and job titles you're already qualified for.</p>
+
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="file-input" accept=".pdf">
+      <div class="upload-label"><strong>Drop your resume PDF here</strong> or click to browse</div>
+      <div class="upload-hint">PDF only · analyzed locally against real job-market data</div>
+    </div>
+    <div class="status-line" id="status-line"></div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="container">
+    <div class="section-tabs">
+      <button class="tab active" data-panel="panel-language">Language</button>
+      <button class="tab" data-panel="panel-skills">Skills</button>
+      <button class="tab" data-panel="panel-pivots">Pivots</button>
+    </div>
+
+    <div class="panel active" id="panel-language">
+      <div class="panel-title">Weak-language scan</div>
+      <p class="panel-sub">Every bullet checked for passive voice, hedging, weak verbs, and missing quantification.</p>
+      <div class="overall-score">
+        <span class="num" id="overall-score-num">—</span>
+        <span class="label">/ 100 overall</span>
+      </div>
+      <div id="bullets-list"></div>
+    </div>
+
+    <div class="panel" id="panel-skills">
+      <div class="panel-title">Skill momentum</div>
+      <p class="panel-sub">Trend-slope of each skill's share of postings over time, from real job-posting data.</p>
+      <div id="skills-list"></div>
+      <div class="note" id="skills-note"></div>
+    </div>
+
+    <div class="panel" id="panel-pivots">
+      <div class="panel-title">Career pivots</div>
+      <p class="panel-sub">Job titles ranked by skill overlap with your resume — roles you're largely already qualified for.</p>
+      <div id="pivots-list"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">CAREER SIGNAL — skill-decay module trained on real job postings, Nov 2022–Sep 2023 · pivot-finder trained on 28k Data-Analyst-category postings</div>
+</footer>
+
+<script>
+const API_BASE = window.location.origin.includes('5173') || window.location.protocol === 'file:'
+  ? 'http://localhost:8000'
+  : '';
+
+const uploadZone = document.getElementById('upload-zone');
+const fileInput = document.getElementById('file-input');
+const statusLine = document.getElementById('status-line');
+const resultsSection = document.getElementById('results');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files.length) handleFile(e.target.files[0]);
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.panel).classList.add('active');
+  });
+});
+
+async function handleFile(file) {
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    statusLine.textContent = '⚠ Only PDF files are supported right now.';
+    return;
+  }
+  statusLine.textContent = `▸ analyzing ${file.name}…`;
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const resp = await fetch(`${API_BASE}/analyze/resume`, { method: 'POST', body: formData });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.detail || `Request failed (${resp.status})`);
+    }
+    const data = await resp.json();
+    statusLine.textContent = `✓ analyzed ${data.extracted_bullets_count} bullets, ${data.extracted_skills.length} skills recognized`;
+    renderResults(data);
+    resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+  } catch (err) {
+    statusLine.textContent = `⚠ ${err.message}`;
+  }
+}
+
+function scoreClass(score) {
+  if (score >= 90) return 'score-high';
+  if (score >= 60) return 'score-mid';
+  return 'score-low';
+}
+
+function renderResults(data) {
+  // --- Weak language ---
+  const wl = data.weak_language;
+  document.getElementById('overall-score-num').textContent = wl.overall_score;
+  const bulletsList = document.getElementById('bullets-list');
+  bulletsList.innerHTML = '';
+  wl.bullets.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'bullet-card' + (b.score === 100 ? ' perfect' : '');
+    div.innerHTML = `
+      <div class="bullet-head">
+        <div class="bullet-text">${escapeHtml(b.original)}</div>
+        <div class="bullet-score ${scoreClass(b.score)}">${b.score}</div>
+      </div>
+      ${b.suggestions.length ? `<div class="bullet-suggestions">${b.suggestions.map(s => `<div>${escapeHtml(s)}</div>`).join('')}</div>` : ''}
+    `;
+    bulletsList.appendChild(div);
+  });
+
+  // --- Skill decay ---
+  const skillsList = document.getElementById('skills-list');
+  const skillsNote = document.getElementById('skills-note');
+  skillsList.innerHTML = '';
+  if (data.skill_decay && data.skill_decay.details.length) {
+    data.skill_decay.details.forEach(d => {
+      const row = document.createElement('div');
+      row.className = 'skill-row';
+      const spark = d.history ? renderSparkline(d.history) : '';
+      row.innerHTML = `
+        <div class="skill-name">${escapeHtml(d.skill)}</div>
+        <div class="skill-spark">${spark}</div>
+        <div class="skill-status status-${d.status}">${d.status.replace('_', ' ')}</div>
+      `;
+      skillsList.appendChild(row);
+    });
+    skillsNote.textContent = 'Momentum = trend-slope of monthly "share of postings" (Nov 2022–Sep 2023). Not all skills have enough tracked history for a reliable trend.';
+  } else {
+    skillsNote.textContent = 'No recognized skills to analyze for this dataset\'s vocabulary.';
+  }
+
+  // --- Career pivots ---
+  const pivotsList = document.getElementById('pivots-list');
+  pivotsList.innerHTML = '';
+  const pivots = (data.career_pivot && data.career_pivot.matched_titles) || [];
+  pivots.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'pivot-card';
+    const simPct = Math.round(p.similarity * 100);
+    card.innerHTML = `
+      <div class="pivot-head">
+        <div class="pivot-title">${escapeHtml(p.title)}</div>
+        <div class="pivot-sim">${simPct}% match</div>
+      </div>
+      <div class="sim-bar"><div class="sim-bar-fill" style="width:${simPct}%"></div></div>
+      <div class="chip-row">${p.overlapping_skills.map(s => `<span class="chip">${escapeHtml(s)}</span>`).join('')}</div>
+    `;
+    pivotsList.appendChild(card);
+  });
+}
+
+function renderSparkline(history) {
+  const values = history.map(h => h.share_pct);
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const w = 100, h = 28, pad = 2;
+  const points = values.map((v, i) => {
+    const x = pad + (i / (values.length - 1)) * (w - pad * 2);
+    const y = h - pad - ((v - min) / range) * (h - pad * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  const trendUp = values[values.length - 1] >= values[0];
+  const color = trendUp ? 'var(--teal)' : 'var(--rust)';
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// health check on load
+fetch(`${API_BASE}/health`).then(r => r.json()).then(d => {
+  document.getElementById('vocab-note').textContent = `${d.skill_vocabulary_size} skills tracked · api online`;
+}).catch(() => {
+  document.getElementById('vocab-note').textContent = 'api offline';
+});
+</script>
+
+</body>
+</html>

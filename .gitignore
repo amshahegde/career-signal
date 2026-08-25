@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Large raw source data (regenerate with data/download_source_data.sh)
+data/gsearch_jobs_*.csv
+
+# Personal / test files — do not commit real resumes
+backend/test_resume.pdf
+*.pdf
+!**/sample_resume.pdf
+
+# OS / editor
+.DS_Store
+.vscode/
+*.swp
+
+# Node (only used transiently for testing, not part of the app)
+node_modules/
+package-lock.json
